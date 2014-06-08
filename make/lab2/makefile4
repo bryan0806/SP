@@ -1,0 +1,11 @@
+#makefile4
+#try to use OBJ %.o : %.c expression
+CC=gcc
+CFLAGS=-I
+DEPS=hellomake.h
+OBJ=hellomake.o hellofunc.o
+
+hellomake:$(OBJ)
+	$(CC) -o hellomake $(OBJ)
+%.o:%.c $(DEPS)
+	$(CC) -c $< -o $@
