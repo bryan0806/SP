@@ -1,0 +1,7 @@
+#makefile2
+#using CC CFLAGS
+CC=gcc
+CFLAGS=-I
+INCLUDE=.
+hellomake: hellomake.c hellofunc.c hellomake.h
+	${CC} -o hellomake ${CFLAGS}${INCLUDE} hellomake.c hellofunc.c
