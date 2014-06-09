@@ -1,0 +1,15 @@
+[root@localhost 14:21:01 kernel]# ./testpid
+Forking ... the pid:0
+0 21875
+1 21875
+2 21875
+3 21875
+4 21875
+Forking ... the pid:21875
+0 21874
+1 21874
+2 21874
+3 21874
+4 21874
+[root@localhost 14:21:06 kernel]# 
+
