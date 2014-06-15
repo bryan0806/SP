@@ -4,14 +4,13 @@
 
 int main(void){
 	int server_fifo_fd,client_fifo_fd;
-	struct data_to_pass_st my_data;
+	struct data_to_pass_st send_data,rec_data;
 	int times_to_send;
 	pid_t pid;	
-
-	mkfifo(CLIENT_FIFO_NAME,0777);
-	printf("open client file\n");
-	printf("start to enter some: \n");
-	scanf("%s",my_data.some_data);
+	int res;
+	
+	res=mkfifo(CLIENT_FIFO_NAME,0777);
+	printf("open client file %d\n",res);
 	
 
 	server_fifo_fd = open(SERVER_FIFO_NAME,O_WRONLY); //打開server端的fifo 寫only
@@ -30,18 +29,21 @@ int main(void){
 
 	if(pid){ // parent
 		while(1){
-			scanf("%s",my_data.some_data);
-			write(server_fifo_fd,&my_data.some_data,sizeof(my_data.some_data));
+			printf("start to enter some: \n");
+			scanf("%s",send_data.some_data); // scanf 讀取不可包含空白的一行
+			write(server_fifo_fd,&send_data,sizeof(send_data));
 		}
 			
 	}else{ // child process
-		read(client_fifo_fd,
-
+		while(1){
+		read(client_fifo_fd,&rec_data,sizeof(rec_data));
+		printf("server said %s\n",rec_data.some_data);
+		}
 	}
 
 	
 	
 	close(server_fifo_fd);
-	unlink(client_fifo);
 	exit(EXIT_SUCCESS);
-}
+	}
+
