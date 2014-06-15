@@ -6,34 +6,35 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include "client2.h"
 
 int main(){
+	int server_fifo_fd;
 	pid_t pid;
+	struct data_to_pass_st my_data;
 	printf("fork program starting\n");
 	pid=fork();
 	int exit_code,result;
-	
+	mkfifo(SERVER_FIFO_NAME,0777);
+
 	switch(pid){
 	case -1:
 		perror("fork failed");
 	case 0:
+		server_fifo_fd=open(SERVER_FIFO_NAME,O_RDONLY);
+		printf("enter child\n");
 		//result=system("./sum_for_child"); be careful !!! result is system return value which is not what I think what it is.
-		sytem("./sum_for_child");
-		result = `$?`;// still can not get result, teacher said must using IPC?
-		printf("result is %d\n",result);
-		exit_code = result;	
-		break;
+		//sytem("./sum_for_child");
+		//result = `$?`;// still can not get result, teacher said must using IPC?
+		if(read(server_fifo_fd,&my_data,sizeof(my_data))>0){
+			
+		printf("result is %d\n",my_data.client_pid);
+		
+		}
+	case 1:
+		printf("enter father\n");
+		execlp("/Users/apple/Documents/embedded/sp/kernel/sum_for_child","sum_for_child","",0);
+
 	}
 	
-	if(pid!=0){
-		int stat_val;
-		pid_t child_pid;
-		child_pid=wait(&stat_val);
-		if(WIFEXITED(stat_val))
-			printf("The result is %d\n",WEXITSTATUS(stat_val));
-		else
-			printf("Child terminated abnormally\n");
-	
-	}
-	exit(exit_code);
 }
