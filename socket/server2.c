@@ -29,7 +29,7 @@ int main(void){
 		printf("server waiting\n");
 	/*Accept a connection */
 		client_len = sizeof(client_address);
-		client_sockfd=accept(server_sockfd,(struct sockaddr *)&client_address,&client_len);
+		client_sockfd=accept(server_sockfd,(struct sockaddr *)&client_address,&client_len);// server端接到client的connect之後產生一個connect socket(client socket) 然後以此cleint socket 作讀寫動作
 	/* We can now read/write to client on client_sockfd */
     read(client_sockfd,&ch,1);
 	ch++;

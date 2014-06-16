@@ -16,21 +16,21 @@ int main(void){
 	char ch='A';	
 	
 	/* Create a socket for the client */
-	sockfd=socket(AF_INET,SOCK_STREAM,0);
+	sockfd=socket(AF_INET,SOCK_STREAM,0); 
 	/* Name the socket as agreed with the server*/
-	address.sin_family=AF_INET;
+	address.sin_family=AF_INET; // 地址是以結構體儲存
 	address.sin_addr.s_addr=inet_addr("127.0.0.1"); // 寫上server ip
 	address.sin_port=9734;
 	len=sizeof(address);
 	/* Now connect our socket to the server's socket */
-	result=connect(sockfd,(struct sockaddr *)&address,len);
+	result=connect(sockfd,(struct sockaddr *)&address,len);// connect使用此格式
 	if(result == -1){
 		perror("oops:client2");
 		exit(1);
 	}
 	/* We can now read/write via sockfd */
-    write(sockfd,&ch,1);
-	read(sockfd,&ch,1);
+    write(sockfd,&ch,1); // server端有一個read在等待
+	read(sockfd,&ch,1); //等待server端回傳write
 	printf("char from server = %c\n",ch);
 	close(sockfd);
 	exit(0);
