@@ -1,4 +1,5 @@
-// shm1.c
+// shm1.c 會創造出shared memory segment
+// shm2.c 則會連結到該segment 然後可輸入資料
 // 負責接收訊息後印出
 #include <stdio.h>
 #include "shm_com.h"
@@ -10,7 +11,7 @@ int main(void){
 	int shmid;
 	srand((unsigned int)getpid());
 	shmid=shmget((key_t)1234,sizeof(struct shared_use_st),0666|IPC_CREAT); // 產生一個共享記憶體 初始化
-	if(shmid==-1){ // 產生過程有錯誤
+	if(shmid==-1){ // 產生過程有錯誤的話
 		fprintf(stderr,"shmget failed\n");
 		exit(EXIT_FAILURE);
 	}
@@ -21,7 +22,9 @@ int main(void){
 		exit(EXIT_FAILURE);
 	}
 	printf("Memory attached at %X\n",(int)shared_memory);
-	
+	/* 接下來的部份 把shared_memory 給 shared_stuff 讓他印出任何在
+ * 	written_by_you 裡面的字串 一直到發現end 字串為止 
+ * 	sleep 會讓consumer 在critical section 讓producer 等待*/
 	shared_stuff=(struct shared_use_st *)shared_memory; //指標指向共用區
 	shared_stuff -> written_by_you =0;
 	while(running){
@@ -34,13 +37,13 @@ int main(void){
 			}
 		}	
 	}
-
+    // 開始移除shard memory
 	if(shmdt(shared_memory)==-1){
 		fprintf(stderr,"shmdt failed\n");
 		exit(EXIT_FAILURE);
 	}
 
-	if(shmct1(shmid,IPC_RMID,0)==-1){
+	if(shmctl(shmid,IPC_RMID,0)==-1){
 		fprintf(stderr,"shmctl(IPC_RMID) failed\n");
 		exit(EXIT_FAILURE);
 	}
