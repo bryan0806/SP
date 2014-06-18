@@ -30,7 +30,7 @@ int main(void){
 	if(pid){ // parent
 		while(1){
 			printf("start to enter some: \n");
-			scanf("%s",send_data.some_data); // scanf 不可讀取包含空白的一行
+			scanf("%s",send_data.some_data); // scanf 不可讀取包含空白的一行 使用gets 則可以一次傳包含空白的一行
 			write(client_fifo_fd,&send_data,sizeof(send_data));
 		}
 			
