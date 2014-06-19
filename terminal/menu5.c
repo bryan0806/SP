@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include <term.h>
 #include <curses.h>
+
 static FILE *output_stream = (FILE *)0;
 
 char *menu[] = {
@@ -50,7 +51,9 @@ int main()
     {
         choice = getchoice("Please select an action", menu,input,output);
         printf("You have chosen: %c\n", choice);
+		sleep(1);// 不加這個的話 會好像沒選擇東西
     } while (choice != 'q');
+	tcsetattr(fileno(input),TCSANOW,&initial_settings);
     exit(0);
 }
 
@@ -58,15 +61,19 @@ int getchoice(char *greet, char *choices[],FILE *in,FILE *out)
 {
     int chosen = 0;
     int selected;
-    int screenrow,screencol=10; // 設定位置用
-    char **option;
+    int screenrow,screencol=11; // 設定位置用
+    
+	char **option;
 	char *cursor,*clear; //設定使用
+	
 	output_stream=out;
+	
 	setupterm(NULL,fileno(out),(int *)0);
 	cursor = tigetstr("cup");
 	clear = tigetstr("clear");
+	
 	screenrow = 4;
-	tputs(clear,1,char_to_terminal);
+	tputs(clear,1,(int *)char_to_terminal);
 	tputs(tparm(cursor,screenrow,screencol),1,char_to_terminal);
 	fprintf(out,"Choice: %s",greet);
 	screenrow += 2;
