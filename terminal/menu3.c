@@ -22,7 +22,7 @@ int main()
       }
 	
 	input=fopen("/dev/tty","r"); // 表示input 指向鍵盤
-	output=fopen("/dev/tty","w"); // 表示output 指向鍵盤
+	output=fopen("/dev/tty","w"); // 表示output 指向螢幕
 	if(!input || !output){
 		fprintf(stderr,"Unable to open /dev/tty\n");
 		exit(1);
@@ -50,9 +50,10 @@ int getchoice(char *greet, char *choices[],FILE *in,FILE *out)
             option++;
         }
 
-
-        selected = getchar();
-        option = choices;
+		do{
+			selected=fgetc(in);
+        }while(selected == '\n');// 要解決 enter 多餘問題 加上此行
+		option = choices;
         while(*option) {
             if(selected == *option[0]) {
                 chosen = 1;
