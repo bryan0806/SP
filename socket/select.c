@@ -32,10 +32,22 @@ int main(){
 		case -1:
 			perror("select");
 			exit(1);
-		// 程式等待過程中 如果有動作 則會從stdin 讀取輸入並把它印出
+		// 程式等待過程中 如果有動作 則會從stdin(檔案描述子為0)	讀取輸入並把它印出
 		default:
-			if(FD_ISSET(0,&testfds)){
+			if(FD_ISSET(0,&testfds)){  // 如果0是testfds的集合中的一個 則回回傳一個非零的值
 				ioctl(0,FIONREAD,&nread);
+/* ioctl ioctl是應用程式用來和驅動程式溝通的API 讓應用程式可以
+對某個裝置下命令你想要用ioctl做什麼事呢?在unix環境中, 
+裝置的存取和檔案是一樣的一般會先用open函式來取得對裝置的一個控制權
+open會傳回一個handle值
+一般用法 ioctl(handle, command, ...)
+前面兩個參數是必須的, 後面的參數則視情況而定handle就是open函式傳回來的值
+command就是一個command code command code每個值所代表的命令會因裝置而異
+完全由驅動程式來解釋command code的意義 有的command code還需要
+傳進額外的參數時, 就會使用第3, 第4...個參數了
+FIONREAD:Return in the integer pointed to by the third argument 
+to ioctl the number of bytes currently in the socket receive buffer. 
+This feature also works for files, pipes, and terminals.*/
 				if(nread==0){
 				printf("keyboard done\n");
 				exit(0);
