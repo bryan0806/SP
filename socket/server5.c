@@ -44,10 +44,12 @@ int main(void){
 		int fd;
 		int nread;
 
-		testfds = readfds;
+		testfds = readfds; // 這邊需要在拷貝一次的原因是 若在處理過程中有新的檔案描述子加入 可確保不會被忽略 而在下次的回圈中被拷貝進去
 
 		printf("server waiting\n");
-	
+		// select 第一個參數為要掃描的數量 FD_SETSIZE=256 所以會掃描0~255
+		// 第二個參數為 readfd的 set 第三個參數為writefd set
+		//第四個參數為error fd 的set 最後為等待時間
 		result = select(FD_SETSIZE,&testfds,(fd_set *)0,(fd_set *)0,(struct timeval *) 0);
 
 		if(result < 1){
@@ -56,7 +58,7 @@ int main(void){
 		}
 		//一旦知道有狀況發生 可以利用FD_ISSET 檢查是哪一個描述子的狀況
 		for(fd=0;fd<FD_SETSIZE;fd++){
-			if(FD_ISSET(fd,&testfds)){
+			if(FD_ISSET(fd,&testfds)){  // 通常用FD_ISSET 來檢查是否有資料讀入或著是寫出 如果有回傳1 
 				//如果是server_sockfd 上的動靜 就表示有新的連結請求
 				//接受連結後 應該將相關的client_sockfd 加到描述子集合中
 				if(fd==server_sockfd){
@@ -66,9 +68,9 @@ int main(void){
 					printf("adding client on fd %d\n",client_sockfd);
 				}else{ // 如果不是伺服器描述子的時候 那就是客戶端的狀況 
 				// 如果收到關閉的狀況 也就是客戶端已經離線 就應該把他從集合中刪除 
-				ioctl(fd,FIONREAD,&nread);
+				ioctl(fd,FIONREAD,&nread); // ioctl 功能很多 這邊FIONREAD 是用來看有多少個位元的資料 在fd裏面等待被讀取
 				
-				if(nread==0){
+				if(nread==0){ // 這邊老師說 是client端要求斷線時 會送出一個沒有位元的特殊信號
 					close(fd);
 					FD_CLR(fd,&readfds);
 					printf("removing client on fd %d\n",fd);
